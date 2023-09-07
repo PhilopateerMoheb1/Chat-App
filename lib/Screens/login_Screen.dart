@@ -1,110 +1,161 @@
 import 'package:chatapp/Constants.dart';
+import 'package:chatapp/Helper/ShowSnackBar.dart';
 import 'package:chatapp/Models/CustomTextField.dart';
 import 'package:chatapp/Screens/Register_Screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 
 import '../Models/CustomWideButton.dart';
 
-class LoginScreen extends StatelessWidget {
-  const LoginScreen({super.key});
+class LoginScreen extends StatefulWidget {
+  LoginScreen({super.key});
+
+  @override
+  State<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
+  bool isLoading = false;
+  String? email;
+  String? password;
+
+  Future<void> authUser() async {
+    final credential = await FirebaseAuth.instance
+        .signInWithEmailAndPassword(email: email!, password: password!);
+  }
+
+  GlobalKey<FormState> formKey = GlobalKey();
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: kPrimaryColor,
-      body: Padding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: 10,
-        ),
-        child: ListView(
-          children: [
-            Center(
-              child: Column(
-                children: [
-                  Image.asset(
-                    "assets/images/scholar.png",
-                    height: 100,
+    return ModalProgressHUD(
+      inAsyncCall: isLoading,
+      child: Scaffold(
+        backgroundColor: kPrimaryColor,
+        body: Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: 10,
+          ),
+          child: Form(
+            key: formKey,
+            child: ListView(
+              children: [
+                Center(
+                  child: Column(
+                    children: [
+                      Image.asset(
+                        "assets/images/scholar.png",
+                        height: 100,
+                      ),
+                      const Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            "Scholar Chat",
+                            style: TextStyle(
+                              fontFamily: 'Pacifico',
+                              fontSize: 32,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ],
+                      )
+                    ],
                   ),
-                  const Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                ),
+                const SizedBox(
+                  height: 100,
+                ),
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
                     children: [
                       Text(
-                        "Scholar Chat",
+                        "Sign in",
                         style: TextStyle(
-                          fontFamily: 'Pacifico',
-                          fontSize: 32,
                           color: Colors.white,
+                          fontSize: 20,
                         ),
                       ),
                     ],
-                  )
-                ],
-              ),
-            ),
-            const SizedBox(
-              height: 100,
-            ),
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Text(
-                    "Sign in",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 20,
-                    ),
                   ),
-                ],
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 6.0),
-              child: CustomTextField(
-                hintText: "Email",
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8.0),
-              child: CustomTextField(
-                hintText: "Password",
-              ),
-            ),
-            const SizedBox(
-              height: 20,
-            ),
-            CustomWideButton(
-              buttonText: "Login ",
-            ),
-            Padding(
-              padding: const EdgeInsets.all(12.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text(
-                    "Don't have an account?  ",
-                    style: TextStyle(
-                      color: Colors.white,
-                    ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 6.0),
+                  child: CustomTextFormField(
+                    onChanged: (data) {
+                      email = data;
+                    },
+                    hintText: "Email",
                   ),
-                  GestureDetector(
-                    onTap: () =>
-                        {Navigator.pushNamed(context, RegisterScreen.id)},
-                    child: const Text(
-                      "Register",
-                      style: TextStyle(
-                        color: Colors.white,
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8.0),
+                  child: CustomTextFormField(
+                    onChanged: (data) {
+                      password = data;
+                    },
+                    hintText: "Password",
+                  ),
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
+                CustomWideButton(
+                  onTap: () async {
+                    if (formKey.currentState!.validate()) {
+                      isLoading = true;
+                      setState(() {});
+                      try {
+                        await authUser();
+                        ShowSnackBarMsg(context, "Success");
+                      } on FirebaseAuthException catch (e) {
+                        if (e.code == 'user-not-found') {
+                          ShowSnackBarMsg(
+                              context, 'No user found for that email.');
+                        } else if (e.code == 'wrong-password') {
+                          ShowSnackBarMsg(context,
+                              'Wrong password provided for that user.');
+                        }
+                      } catch (e) {}
+                      isLoading = false;
+                      setState(() {});
+                    }
+                  },
+                  buttonText: "Login ",
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(12.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text(
+                        "Don't have an account?  ",
+                        style: TextStyle(
+                          color: Colors.white,
+                        ),
                       ),
-                    ),
+                      GestureDetector(
+                        onTap: () =>
+                            {Navigator.pushNamed(context, RegisterScreen.id)},
+                        child: const Text(
+                          "Register",
+                          style: TextStyle(
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
+                ),
+                const Spacer(
+                  flex: 1,
+                )
+              ],
             ),
-            const Spacer(
-              flex: 1,
-            )
-          ],
+          ),
         ),
       ),
     );
