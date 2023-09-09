@@ -1,6 +1,7 @@
 import 'package:chatapp/Constants.dart';
 import 'package:chatapp/Helper/ShowSnackBar.dart';
 import 'package:chatapp/Models/CustomTextField.dart';
+import 'package:chatapp/Screens/Chat_Screen.dart';
 import 'package:chatapp/Screens/Register_Screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -10,6 +11,7 @@ import '../Models/CustomWideButton.dart';
 
 class LoginScreen extends StatefulWidget {
   LoginScreen({super.key});
+  static String id = 'LoginPage';
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -111,6 +113,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       try {
                         await authUser();
                         ShowSnackBarMsg(context, "Success");
+                        Navigator.pushNamed(context, ChatScreen.id);
                       } on FirebaseAuthException catch (e) {
                         if (e.code == 'user-not-found') {
                           ShowSnackBarMsg(

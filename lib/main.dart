@@ -1,3 +1,4 @@
+import 'package:chatapp/Screens/Chat_Screen.dart';
 import 'package:chatapp/Screens/Register_Screen.dart';
 import 'package:chatapp/Screens/login_Screen.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -21,10 +22,11 @@ class ChatApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       routes: {
-        'LoginPage': (context) => LoginScreen(),
-        'RegisterPage': (context) => RegisterScreen()
+        LoginScreen.id: (context) => LoginScreen(),
+        RegisterScreen.id: (context) => RegisterScreen(),
+        ChatScreen.id: (context) => ChatScreen()
       },
-      home: LoginScreen(),
+      initialRoute: LoginScreen.id,
     );
   }
 }
