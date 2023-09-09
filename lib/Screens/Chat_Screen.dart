@@ -14,9 +14,11 @@ class ChatScreen extends StatelessWidget {
   CollectionReference msgs = FirebaseFirestore.instance.collection(kcollection);
 
   TextEditingController textEditingController = TextEditingController();
+  ScrollController scrollController = ScrollController();
 
   @override
   Widget build(BuildContext context) {
+    var email = ModalRoute.of(context)!.settings.arguments;
     return StreamBuilder<QuerySnapshot>(
         stream: msgs.orderBy('time').snapshots(),
         builder: (context, snapshot) {
@@ -37,9 +39,16 @@ class ChatScreen extends StatelessWidget {
                 children: [
                   Expanded(
                     child: ListView.builder(
+                        controller: scrollController,
                         itemCount: messageList.length,
                         itemBuilder: (context, index) {
-                          return ChatBubble(msg: messageList[index]);
+                          if (email == messageList[index].id) {
+                            return ChatBubble(
+                                msg: messageList[index], id: email);
+                          } else {
+                            return ChatBubbleFriend(
+                                msg: messageList[index], id: email);
+                          }
                         }),
                   ),
                   Padding(
@@ -50,7 +59,13 @@ class ChatScreen extends StatelessWidget {
                         msgs.add({
                           kDocument: value,
                           'time': DateTime.now(),
+                          'id': email,
                         });
+                        scrollController.animateTo(
+                          scrollController.position.maxScrollExtent,
+                          duration: const Duration(milliseconds: 300),
+                          curve: Curves.easeIn,
+                        );
                         textEditingController.clear();
                       },
                       decoration: const InputDecoration(

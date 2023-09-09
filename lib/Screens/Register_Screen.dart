@@ -25,6 +25,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   bool isLoading = false;
 
   GlobalKey<FormState> formKey = GlobalKey();
+  TextEditingController textEditingController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -93,6 +94,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         password = data;
                       },
                       hintText: "Password",
+                      ispassword: true,
                     ),
                   ),
                   const SizedBox(
@@ -115,6 +117,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           }
                         }
                         isLoading = false;
+                        textEditingController.clear();
                         setState(() {});
                       }
                     },

@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:chatapp/Constants.dart';
 import 'package:chatapp/Helper/ShowSnackBar.dart';
 import 'package:chatapp/Models/CustomTextField.dart';
@@ -28,6 +30,7 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   GlobalKey<FormState> formKey = GlobalKey();
+  TextEditingController textEditingController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -99,6 +102,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     onChanged: (data) {
                       password = data;
                     },
+                    ispassword: true,
                     hintText: "Password",
                   ),
                 ),
@@ -113,7 +117,8 @@ class _LoginScreenState extends State<LoginScreen> {
                       try {
                         await authUser();
                         ShowSnackBarMsg(context, "Success");
-                        Navigator.pushNamed(context, ChatScreen.id);
+                        Navigator.pushNamed(context, ChatScreen.id,
+                            arguments: email);
                       } on FirebaseAuthException catch (e) {
                         if (e.code == 'user-not-found') {
                           ShowSnackBarMsg(
@@ -124,6 +129,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         }
                       } catch (e) {}
                       isLoading = false;
+                      textEditingController.clear();
                       setState(() {});
                     }
                   },

@@ -14,7 +14,7 @@ class CustomTitle extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
-        SizedBox(
+        const SizedBox(
           width: 70,
         ),
         Image.asset(
